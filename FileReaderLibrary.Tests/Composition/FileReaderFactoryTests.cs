@@ -168,6 +168,79 @@ public class FileReaderFactoryTests
     }
 
     [Fact]
+    public void Create_WhenJsonWithRoleSecurityAsViewerAllowed_ReadsContent()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        var path = Path.Combine(directory, "allowed.json");
+        var factory = new FileReaderFactory(
+            new ReverseEncryptionAlgorithm(),
+            new ConfigurableFileAccessPolicy(["allowed.json"]));
+        var reader = factory.Create(new FileReadRequest
+        {
+            Path = path,
+            Format = FileFormat.Json,
+            UseRoleSecurity = true,
+            Role = UserRole.Viewer
+        });
+
+        try
+        {
+            const string json = """{"message":"viewer json access"}""";
+            File.WriteAllText(path, json);
+
+            var result = reader.Read(path);
+
+            Assert.Equal(json, result);
+        }
+        finally
+        {
+            if (Directory.Exists(directory))
+            {
+                Directory.Delete(directory, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
+    public void Create_WhenJsonWithRoleSecurityAsViewerDenied_ThrowsUnauthorizedAccessException()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.json");
+        var factory = new FileReaderFactory(
+            new ReverseEncryptionAlgorithm(),
+            new ConfigurableFileAccessPolicy(["allowed.json"]));
+        var reader = factory.Create(new FileReadRequest
+        {
+            Path = path,
+            Format = FileFormat.Json,
+            UseRoleSecurity = true,
+            Role = UserRole.Viewer
+        });
+
+        Assert.Throws<UnauthorizedAccessException>(() => reader.Read(path));
+    }
+
+    [Fact]
+    public void Create_SampleRbacJsonAsViewer_ReturnsContent()
+    {
+        var path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.rbac.json");
+        var factory = new FileReaderFactory(
+            new ReverseEncryptionAlgorithm(),
+            new ConfigurableFileAccessPolicy(["hello.rbac.json"]));
+        var reader = factory.Create(new FileReadRequest
+        {
+            Path = path,
+            Format = FileFormat.Json,
+            UseRoleSecurity = true,
+            Role = UserRole.Viewer
+        });
+
+        var result = reader.Read(path);
+
+        Assert.Contains("\"message\": \"Hello from FileReaderLibrary v9.\"", result);
+    }
+
+    [Fact]
     public void Create_WhenRoleSecurityEnabled_EnforcesAccessPolicy()
     {
         var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.xml");

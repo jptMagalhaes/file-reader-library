@@ -1,44 +1,35 @@
 ﻿using System.IO;
 using System.Windows;
+using FileReaderApp.Coordinators;
 using FileReaderApp.Services;
+using FileReaderApp.ViewModels;
 using FileReaderLibrary.Composition;
 using FileReaderLibrary.Infrastructure;
-using FileReaderLibrary.Models;
 
-namespace FileReaderApp;
-
-public partial class MainWindow : Window
+namespace FileReaderApp
 {
-    private readonly FileReadService _fileReadService;
-
-    public MainWindow()
+    public partial class MainWindow : Window
     {
-        InitializeComponent();
-
-        var factory = new FileReaderFactory(
-            new ReverseEncryptionAlgorithm(),
-            new ConfigurableFileAccessPolicy());
-
-        _fileReadService = new FileReadService(factory.Create(new FileReadRequest
+        public MainWindow()
         {
-            Path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.encrypted.json"),
-            Format = FileFormat.Json,
-            UseEncryption = true
-        }));
+            InitializeComponent();
 
-        Loaded += OnLoaded;
-    }
+            var samplesDirectory = Path.Combine(AppContext.BaseDirectory, "samples");
+            var factory = new FileReaderFactory(
+                new ReverseEncryptionAlgorithm(),
+                new ConfigurableFileAccessPolicy(
+                [
+                    "hello.rbac.json",
+                    "hello.rbac.xml",
+                    "hello.rbac.txt"
+                ]));
 
-    private void OnLoaded(object sender, RoutedEventArgs e)
-    {
-        var path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.encrypted.json");
-        try
-        {
-            SampleContentText.Text = _fileReadService.Read(path);
+            var coordinator = new FileReadSessionCoordinator(factory, samplesDirectory);
+            DataContext = new MainWindowViewModel(coordinator, new WpfFilePickerService());
         }
-        catch (Exception ex)
-        {
-            SampleContentText.Text = $"Failed to read {path}:\n{ex.Message}";
-        }
+
+        private void OnMinimizeClick(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+
+        private void OnCloseClick(object sender, RoutedEventArgs e) => Close();
     }
 }
