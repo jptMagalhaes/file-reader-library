@@ -1,13 +1,18 @@
 ﻿using System.IO;
 using System.Windows;
 using FileReaderApp.Services;
+using FileReaderLibrary.Decorators;
+using FileReaderLibrary.Infrastructure;
 using FileReaderLibrary.Readers;
 
 namespace FileReaderApp;
 
 public partial class MainWindow : Window
 {
-    private readonly FileReadService _fileReadService = new(new XmlFileReader());
+    private readonly FileReadService _fileReadService = new(
+        new EncryptedFileReaderDecorator(
+            new TextFileReader(),
+            new ReverseEncryptionAlgorithm()));
 
     public MainWindow()
     {
@@ -17,7 +22,7 @@ public partial class MainWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        var path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.xml");
+        var path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.encrypted.txt");
         try
         {
             SampleContentText.Text = _fileReadService.Read(path);
