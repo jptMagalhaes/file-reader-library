@@ -3,6 +3,7 @@ using System.Windows;
 using FileReaderApp.Services;
 using FileReaderLibrary.Decorators;
 using FileReaderLibrary.Infrastructure;
+using FileReaderLibrary.Models;
 using FileReaderLibrary.Readers;
 
 namespace FileReaderApp;
@@ -10,9 +11,10 @@ namespace FileReaderApp;
 public partial class MainWindow : Window
 {
     private readonly FileReadService _fileReadService = new(
-        new EncryptedFileReaderDecorator(
-            new TextFileReader(),
-            new ReverseEncryptionAlgorithm()));
+        new RoleBasedFileReaderDecorator(
+            new XmlFileReader(),
+            new ConfigurableFileAccessPolicy(["hello.rbac.xml"]),
+            UserRole.Viewer));
 
     public MainWindow()
     {
@@ -22,7 +24,7 @@ public partial class MainWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        var path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.encrypted.txt");
+        var path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.rbac.xml");
         try
         {
             SampleContentText.Text = _fileReadService.Read(path);
