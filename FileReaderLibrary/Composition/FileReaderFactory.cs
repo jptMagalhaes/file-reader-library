@@ -23,6 +23,8 @@ public sealed class FileReaderFactory(
             FileFormat.Text => new TextFileReader(),
             FileFormat.Xml when request.UseEncryption => new TextFileReader(),
             FileFormat.Xml => new XmlFileReader(),
+            FileFormat.Json when request.UseEncryption => new TextFileReader(),
+            FileFormat.Json => new JsonFileReader(),
             _ => throw new ArgumentOutOfRangeException(nameof(request), request.Format, "Unsupported file format.")
         };
 

@@ -234,6 +234,21 @@ public class FileReaderFactoryTests
     }
 
     [Fact]
+    public void Create_WhenJsonRequested_ReadsValidJson()
+    {
+        var path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.json");
+        var reader = _factory.Create(new FileReadRequest
+        {
+            Path = path,
+            Format = FileFormat.Json
+        });
+
+        var result = reader.Read(path);
+
+        Assert.Contains("\"message\": \"Hello from FileReaderLibrary v7.\"", result);
+    }
+
+    [Fact]
     public void Create_WhenXmlEncryptedAndRoleSecurityAllEnabled_ComposesAllDecoratorsAndSucceeds()
     {
         var path = Path.GetTempFileName();
