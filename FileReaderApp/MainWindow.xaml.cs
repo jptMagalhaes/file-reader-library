@@ -17,13 +17,14 @@ public partial class MainWindow : Window
 
         var factory = new FileReaderFactory(
             new ReverseEncryptionAlgorithm(),
-            new ConfigurableFileAccessPolicy());
+            new ConfigurableFileAccessPolicy(["hello.rbac.txt"]));
 
         _fileReadService = new FileReadService(factory.Create(new FileReadRequest
         {
-            Path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.encrypted.xml"),
-            Format = FileFormat.Xml,
-            UseEncryption = true
+            Path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.rbac.txt"),
+            Format = FileFormat.Text,
+            UseRoleSecurity = true,
+            Role = UserRole.Viewer
         }));
 
         Loaded += OnLoaded;
@@ -31,7 +32,7 @@ public partial class MainWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        var path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.encrypted.xml");
+        var path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.rbac.txt");
         try
         {
             SampleContentText.Text = _fileReadService.Read(path);

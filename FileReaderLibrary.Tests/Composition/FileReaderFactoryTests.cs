@@ -95,6 +95,78 @@ public class FileReaderFactoryTests
     }
 
     [Fact]
+    public void Create_WhenTextWithRoleSecurityAsViewerAllowed_ReadsContent()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        var path = Path.Combine(directory, "allowed.txt");
+        var factory = new FileReaderFactory(
+            new ReverseEncryptionAlgorithm(),
+            new ConfigurableFileAccessPolicy(["allowed.txt"]));
+        var reader = factory.Create(new FileReadRequest
+        {
+            Path = path,
+            Format = FileFormat.Text,
+            UseRoleSecurity = true,
+            Role = UserRole.Viewer
+        });
+
+        try
+        {
+            File.WriteAllText(path, "viewer text access");
+
+            var result = reader.Read(path);
+
+            Assert.Equal("viewer text access", result);
+        }
+        finally
+        {
+            if (Directory.Exists(directory))
+            {
+                Directory.Delete(directory, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
+    public void Create_WhenTextWithRoleSecurityAsViewerDenied_ThrowsUnauthorizedAccessException()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.txt");
+        var factory = new FileReaderFactory(
+            new ReverseEncryptionAlgorithm(),
+            new ConfigurableFileAccessPolicy(["allowed.txt"]));
+        var reader = factory.Create(new FileReadRequest
+        {
+            Path = path,
+            Format = FileFormat.Text,
+            UseRoleSecurity = true,
+            Role = UserRole.Viewer
+        });
+
+        Assert.Throws<UnauthorizedAccessException>(() => reader.Read(path));
+    }
+
+    [Fact]
+    public void Create_SampleRbacTextAsViewer_ReturnsContent()
+    {
+        var path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.rbac.txt");
+        var factory = new FileReaderFactory(
+            new ReverseEncryptionAlgorithm(),
+            new ConfigurableFileAccessPolicy(["hello.rbac.txt"]));
+        var reader = factory.Create(new FileReadRequest
+        {
+            Path = path,
+            Format = FileFormat.Text,
+            UseRoleSecurity = true,
+            Role = UserRole.Viewer
+        });
+
+        var result = reader.Read(path);
+
+        Assert.Contains("Hello from FileReaderLibrary v6.", result);
+    }
+
+    [Fact]
     public void Create_WhenRoleSecurityEnabled_EnforcesAccessPolicy()
     {
         var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.xml");
