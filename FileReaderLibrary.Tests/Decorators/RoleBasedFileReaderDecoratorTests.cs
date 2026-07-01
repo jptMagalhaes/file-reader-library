@@ -70,6 +70,32 @@ public class RoleBasedFileReaderDecoratorTests
     }
 
     [Fact]
+    public void Read_WhenRoleIsAnonymous_ThrowsUnauthorizedAccessException()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.xml");
+        var reader = new RoleBasedFileReaderDecorator(
+            new XmlFileReader(),
+            new ConfigurableFileAccessPolicy(["hello.rbac.xml"]),
+            UserRole.Anonymous);
+
+        Assert.Throws<UnauthorizedAccessException>(() => reader.Read(path));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Read_WhenPathIsInvalid_ThrowsArgumentException(string? path)
+    {
+        var reader = new RoleBasedFileReaderDecorator(
+            new XmlFileReader(),
+            new ConfigurableFileAccessPolicy(),
+            UserRole.Admin);
+
+        Assert.ThrowsAny<ArgumentException>(() => reader.Read(path!));
+    }
+
+    [Fact]
     public void Constructor_WhenInnerReaderIsNull_ThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() =>

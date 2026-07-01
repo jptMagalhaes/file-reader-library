@@ -36,6 +36,22 @@ public class TextFileReaderTests
     }
 
     [Fact]
+    public void Read_WhenFileIsEmpty_ReturnsEmptyString()
+    {
+        var path = Path.GetTempFileName();
+        try
+        {
+            var result = _reader.Read(path);
+
+            Assert.Equal(string.Empty, result);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
     public void Read_WhenFileMissing_ThrowsFileNotFoundException()
     {
         var missingPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.txt");

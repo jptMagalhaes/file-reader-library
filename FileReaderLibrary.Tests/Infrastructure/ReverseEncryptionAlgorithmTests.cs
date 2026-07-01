@@ -32,4 +32,18 @@ public class ReverseEncryptionAlgorithmTests
     {
         Assert.Throws<ArgumentNullException>(() => _algorithm.Encrypt(null!));
     }
+
+    [Fact]
+    public void Decrypt_WhenCipherTextIsNull_ThrowsArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() => _algorithm.Decrypt(null!));
+    }
+
+    [Fact]
+    public void Encrypt_WhenPlainTextIsEmpty_ReturnsEmptyString()
+    {
+        var encrypted = _algorithm.Encrypt(string.Empty);
+
+        Assert.Equal(string.Empty, encrypted);
+    }
 }

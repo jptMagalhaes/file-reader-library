@@ -44,4 +44,25 @@ public class ConfigurableFileAccessPolicyTests
 
         Assert.False(canRead);
     }
+
+    [Fact]
+    public void CanRead_WhenRoleIsAnonymous_ReturnsFalse()
+    {
+        var policy = new ConfigurableFileAccessPolicy(["hello.rbac.xml"]);
+
+        var canRead = policy.CanRead(@"C:\samples\hello.rbac.xml", UserRole.Anonymous);
+
+        Assert.False(canRead);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void CanRead_WhenPathIsInvalid_ThrowsArgumentException(string? path)
+    {
+        var policy = new ConfigurableFileAccessPolicy();
+
+        Assert.ThrowsAny<ArgumentException>(() => policy.CanRead(path!, UserRole.Admin));
+    }
 }

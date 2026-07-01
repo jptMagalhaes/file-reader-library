@@ -53,6 +53,19 @@ public class EncryptedFileReaderDecoratorTests
         Assert.Throws<FileNotFoundException>(() => reader.Read(missingPath));
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Read_WhenPathIsInvalid_PropagatesArgumentExceptionFromInnerReader(string? path)
+    {
+        var reader = new EncryptedFileReaderDecorator(
+            new TextFileReader(),
+            new ReverseEncryptionAlgorithm());
+
+        Assert.ThrowsAny<ArgumentException>(() => reader.Read(path!));
+    }
+
     [Fact]
     public void Constructor_WhenInnerReaderIsNull_ThrowsArgumentNullException()
     {

@@ -53,6 +53,20 @@ public class XmlFileReaderTests
     }
 
     [Fact]
+    public void Read_WhenFileIsEmpty_ThrowsXmlException()
+    {
+        var path = Path.GetTempFileName();
+        try
+        {
+            Assert.Throws<XmlException>(() => _reader.Read(path));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
     public void Read_WhenFileMissing_ThrowsFileNotFoundException()
     {
         var missingPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.xml");
