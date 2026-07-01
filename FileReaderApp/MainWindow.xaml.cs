@@ -21,8 +21,9 @@ public partial class MainWindow : Window
 
         _fileReadService = new FileReadService(factory.Create(new FileReadRequest
         {
-            Path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.json"),
-            Format = FileFormat.Json
+            Path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.encrypted.json"),
+            Format = FileFormat.Json,
+            UseEncryption = true
         }));
 
         Loaded += OnLoaded;
@@ -30,7 +31,7 @@ public partial class MainWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        var path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.json");
+        var path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.encrypted.json");
         try
         {
             SampleContentText.Text = _fileReadService.Read(path);

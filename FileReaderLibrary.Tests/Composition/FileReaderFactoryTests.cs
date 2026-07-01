@@ -1,4 +1,5 @@
 using System.Xml;
+using System.Text.Json;
 using FileReaderLibrary.Composition;
 using FileReaderLibrary.Infrastructure;
 using FileReaderLibrary.Models;
@@ -246,6 +247,73 @@ public class FileReaderFactoryTests
         var result = reader.Read(path);
 
         Assert.Contains("\"message\": \"Hello from FileReaderLibrary v7.\"", result);
+    }
+
+    [Fact]
+    public void Create_WhenEncryptedJsonRequested_ReadsDecryptedJson()
+    {
+        var path = Path.GetTempFileName();
+        var algorithm = new ReverseEncryptionAlgorithm();
+        var reader = _factory.Create(new FileReadRequest
+        {
+            Path = path,
+            Format = FileFormat.Json,
+            UseEncryption = true
+        });
+
+        try
+        {
+            const string json = """{"message":"encrypted json"}""";
+            File.WriteAllText(path, algorithm.Encrypt(json));
+
+            var result = reader.Read(path);
+
+            Assert.Equal(json, result);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void Create_SampleEncryptedJson_ReturnsDecryptedContent()
+    {
+        var path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.encrypted.json");
+        var reader = _factory.Create(new FileReadRequest
+        {
+            Path = path,
+            Format = FileFormat.Json,
+            UseEncryption = true
+        });
+
+        var result = reader.Read(path);
+
+        Assert.Contains("\"message\": \"Hello from FileReaderLibrary v8.\"", result);
+    }
+
+    [Fact]
+    public void Create_WhenEncryptedJsonIsMalformed_ThrowsJsonException()
+    {
+        var path = Path.GetTempFileName();
+        var algorithm = new ReverseEncryptionAlgorithm();
+        var reader = _factory.Create(new FileReadRequest
+        {
+            Path = path,
+            Format = FileFormat.Json,
+            UseEncryption = true
+        });
+
+        try
+        {
+            File.WriteAllText(path, algorithm.Encrypt("""{"message":"""));
+
+            Assert.ThrowsAny<JsonException>(() => reader.Read(path));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
     }
 
     [Fact]

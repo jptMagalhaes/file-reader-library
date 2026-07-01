@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FileReaderApp"
         mc:Ignorable="d"
-        Title="File Reader Library — v7 demo" Height="450" Width="800">
+        Title="File Reader Library — v8 demo" Height="450" Width="800">
     <Grid Margin="16">
         <TextBlock x:Name="SampleContentText"
                    TextWrapping="Wrap"

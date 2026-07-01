@@ -36,6 +36,11 @@ public sealed class FileReaderFactory(
             {
                 reader = new XmlValidationDecorator(reader);
             }
+
+            if (request.Format == FileFormat.Json)
+            {
+                reader = new JsonValidationDecorator(reader);
+            }
         }
 
         if (request.UseRoleSecurity)
