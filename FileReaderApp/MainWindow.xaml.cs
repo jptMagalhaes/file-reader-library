@@ -7,7 +7,7 @@ namespace FileReaderApp;
 
 public partial class MainWindow : Window
 {
-    private readonly FileReadService _fileReadService = new(new TextFileReader());
+    private readonly FileReadService _fileReadService = new(new XmlFileReader());
 
     public MainWindow()
     {
@@ -17,7 +17,7 @@ public partial class MainWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        var path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.txt");
+        var path = Path.Combine(AppContext.BaseDirectory, "samples", "hello.xml");
         try
         {
             SampleContentText.Text = _fileReadService.Read(path);
