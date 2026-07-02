@@ -1,44 +1,62 @@
 # File Reader Library
 
-Biblioteca C# extensível (Strategy + Decorator + DI) para leitura de ficheiros de texto, XML e JSON,
-com suporte opcional a encriptação e segurança baseada em papéis (roles).
+Extensible C# library (Strategy + Decorator + Factory) for reading text, XML, and JSON files,
+with optional encryption and role-based access control.
 
-Desenvolvida incrementalmente através de user stories, cada uma taggeada como uma versão (`v1`–`v9`).
+Built incrementally through user stories, each tagged as a version (`v1`–`v9`), plus a WPF demo app.
 
-## Estrutura
+## Structure
 
 ```
 FileReaderLibrary.sln
-FileReaderLibrary/          # biblioteca principal
-FileReaderLibrary.Tests/    # testes xUnit
-FileReaderApp/              # aplicação WPF de demonstração (bonus)
-samples/                    # ficheiros de exemplo para testar manualmente
+FileReaderLibrary/          # core library
+FileReaderLibrary.Tests/    # xUnit tests
+FileReaderApp/              # WPF interactive demo (bonus)
+samples/                    # sample files for manual testing
 ```
 
-## Como correr
+## Requirements
 
-A library em si **não é executável** — valida com testes ou com a app WPF de demo.
+- .NET 9 SDK
+- Windows (WPF demo only)
+
+## How to run
+
+The library itself is **not executable** — validate it with tests or the WPF demo.
 
 ```powershell
-# testes (v1+)
+# run all tests
 dotnet test
 
-# demo WPF — lê samples/hello.txt com TextFileReader
+# WPF demo — pick a sample or browse for a file
 dotnet run --project FileReaderApp/FileReaderApp.csproj
 ```
 
-No VS Code: F5 com perfil **FileReaderApp (WPF demo)** (`.vscode/launch.json`).
+In VS Code / Cursor: **F5** with the **FileReaderApp** launch profile (`.vscode/launch.json`).
 
-## Mapa de versões
+Run commands from the folder that contains `FileReaderLibrary.sln`.
+
+## WPF demo
+
+The demo lets you:
+
+- Select a file from `samples/` or browse for your own
+- Choose format (Text, Xml, Json)
+- Toggle encryption and role security
+- Pick a role (Admin / Viewer)
+
+Viewer access is restricted to an allowlist of sample filenames (`hello.rbac.*`).
+
+## Version map
 
 | Tag | User story |
 |-----|------------|
-| v1 | Ler ficheiro de texto |
-| v2 | Ler ficheiro XML |
-| v3 | Ler ficheiro TEXT encriptado |
-| v4 | Ler ficheiros XML com segurança baseada em papéis |
-| v5 | Ler ficheiro XML encriptado |
-| v6 | Ler ficheiro TEXT com segurança baseada em papéis |
-| v7 | Ler ficheiro JSON |
-| v8 | Ler ficheiro JSON encriptado |
-| v9 | Ler ficheiro JSON com segurança baseada em papéis |
+| v1 | Read a text file |
+| v2 | Read an XML file |
+| v3 | Read an encrypted text file |
+| v4 | Read XML files with role-based security |
+| v5 | Read an encrypted XML file |
+| v6 | Read a text file with role-based security |
+| v7 | Read a JSON file |
+| v8 | Read an encrypted JSON file |
+| v9 | Read a JSON file with role-based security |
